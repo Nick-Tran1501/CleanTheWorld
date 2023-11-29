@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "356629548969",
+    "project_id": "cleantheworld-25cbc",
+    "storage_bucket": "cleantheworld-25cbc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:356629548969:android:3bc47b56ec3bf23c153eb8",
+        "android_client_info": {
+          "package_name": "com.example.cleantheworld"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLq8zrmEZsKrmVqUHtvQ0mNZPt3fgISoA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
