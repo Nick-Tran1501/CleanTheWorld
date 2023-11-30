@@ -1,7 +1,7 @@
 package com.example.cleantheworld.ui.theme
 import androidx.compose.ui.graphics.Color
-
-val md_theme_light_primary = Color(0xFF246D00)
+//0xFF81DC5A
+val md_theme_light_primary = Color(0xFF81DC5A)
 val md_theme_light_onPrimary = Color(0xFFFFFFFF)
 val md_theme_light_primaryContainer = Color(0xFF9CF973)
 val md_theme_light_onPrimaryContainer = Color(0xFF062100)
@@ -26,7 +26,7 @@ val md_theme_light_onSurfaceVariant = Color(0xFF43483E)
 val md_theme_light_outline = Color(0xFF73796D)
 val md_theme_light_inverseOnSurface = Color(0xFFD6F6FF)
 val md_theme_light_inverseSurface = Color(0xFF00363F)
-val md_theme_light_inversePrimary = Color(0xFF81DC5A)
+val md_theme_light_inversePrimary = Color(0xFF246D00)
 val md_theme_light_shadow = Color(0xFF000000)
 val md_theme_light_surfaceTint = Color(0xFF246D00)
 val md_theme_light_outlineVariant = Color(0xFFC3C8BB)

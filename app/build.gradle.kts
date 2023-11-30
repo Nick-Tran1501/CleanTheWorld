@@ -62,7 +62,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
-    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-firestore:24.9.1")
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth:22.3.0")
 //    implementation("com.google.firebase:firebase-auth-ktx:22.3.0")

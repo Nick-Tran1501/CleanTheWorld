@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -17,6 +18,7 @@ import com.example.cleantheworld.activities.HomeScreenActivity
 import com.example.cleantheworld.activities.LoginScreenActivity
 import com.example.cleantheworld.activities.RegisterScreenActivity
 import com.example.cleantheworld.ui.theme.AppTheme
+import com.example.cleantheworld.utils.ThemeViewModel
 import com.google.firebase.FirebaseApp
 
 //    "storage_bucket": "cleantheworld-25cbc.appspot.com"
@@ -26,7 +28,10 @@ class MainActivity : ComponentActivity() {
         FirebaseApp.initializeApp(this)
             // After the delay, set the content view to your main layout
             setContent {
-                AppTheme {
+                val themeViewModel: ThemeViewModel = viewModel()
+                // Observe the theme state
+                val isDarkTheme = themeViewModel.isDarkTheme.value
+                AppTheme(useDarkTheme = isDarkTheme) {
                     // A surface container using the 'background' color from the theme
                     Surface(
                         modifier = Modifier.fillMaxSize(),
@@ -43,13 +48,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainNavigationActivity(){
     val navController = rememberNavController()
-
+    val themeViewModel: ThemeViewModel = viewModel()
     NavHost(navController = navController, startDestination = "login_screen"){
         composable("login_screen"){
-            LoginScreenActivity(navController)
+            LoginScreenActivity(navController, themeViewModel)
         }
         composable("register_screen"){
-            RegisterScreenActivity()
+            RegisterScreenActivity(navController, themeViewModel)
         }
         composable("home_screen"){
             HomeScreenActivity()
