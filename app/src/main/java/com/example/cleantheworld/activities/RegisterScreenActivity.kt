@@ -23,7 +23,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -35,10 +37,10 @@ import com.example.cleantheworld.R
 import com.example.cleantheworld.authentication.UserAuthManager
 import com.example.cleantheworld.ui.components.showToast
 import com.example.cleantheworld.utils.ThemeViewModel
-import kotlinx.coroutines.launch
+
 
 @Composable
-fun RegisterScreenActivity(navController: NavController, themeViewModel: ThemeViewModel){
+fun RegisterScreenActivity(navController: NavController, themeViewModel: ThemeViewModel) {
     val isDarkTheme = themeViewModel.isDarkTheme.value
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -48,13 +50,18 @@ fun RegisterScreenActivity(navController: NavController, themeViewModel: ThemeVi
     var phone by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
+    val context = LocalContext.current
+    val textToastColorSuccess = MaterialTheme.colorScheme.onPrimary.toArgb()
+    val successColor = MaterialTheme.colorScheme.primary.toArgb()
+    val textToastColorError = MaterialTheme.colorScheme.onError.toArgb()
+    val errorColor = MaterialTheme.colorScheme.error.toArgb()
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
-    ){
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -157,12 +164,24 @@ fun RegisterScreenActivity(navController: NavController, themeViewModel: ThemeVi
 
         Button(
             onClick = {
-                UserAuthManager.registerUser(email, password, name , age, phone, onSuccess = {
-                    // Handle successful login
-                    navController.navigate("home_screen")
-                }, onError = { error ->
-                    errorMessage = error
-                })
+                if (email.isBlank() || password.isBlank() || age.isBlank() || phone.isBlank()) {
+                    showToast(context, "Please fill in all fields", errorColor, textToastColorError)
+                } else {
+                    UserAuthManager.registerUser(email, password, name, age, phone, onSuccess = {
+                        // Handle successful login
+                        showToast(
+                            context,
+                            "Register Successfully",
+                            successColor,
+                            textToastColorSuccess
+                        )
+                        navController.navigate("home_screen")
+                    }, onError = { error ->
+                        errorMessage = error
+                        showToast(context, errorMessage.toString(), errorColor, textToastColorError)
+                    })
+                }
+
             },
             modifier = Modifier.fillMaxWidth()
         ) {
