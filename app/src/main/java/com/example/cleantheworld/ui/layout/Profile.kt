@@ -1,5 +1,6 @@
 package com.example.cleantheworld.ui.layout
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -74,21 +75,14 @@ fun MyProfileScreen(user: User, themeViewModel: ThemeViewModel, navController: N
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Edit buttons
-        Button(onClick = { /* Handle edit name */ }) {
-            Text("Edit Name")
-        }
-        Button(onClick = { /* Handle edit age */ }) {
-            Text("Edit Age")
-        }
-        Button(onClick = { /* Handle edit phone */ }) {
-            Text("Edit Phone")
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
 
         // Dark mode toggle
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Text("Dark Mode")
             Switch(
                 checked = isDarkTheme,
