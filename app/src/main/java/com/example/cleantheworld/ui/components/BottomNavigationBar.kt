@@ -46,11 +46,11 @@ fun BottomNavigationBar(navController: NavController, admin: Boolean) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = item.icon),
                             contentDescription = item.title,
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            tint = MaterialTheme.colorScheme.secondary
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+//                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                             text = item.title,
                             style = MaterialTheme.typography.bodySmall
                         )

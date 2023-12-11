@@ -2,6 +2,7 @@ package com.example.cleantheworld.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,13 +18,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.cleantheworld.R
 import com.example.cleantheworld.models.CleanUpSite
 import com.example.cleantheworld.models.DirtyLevel
 import com.example.cleantheworld.utils.ThemeViewModel
 
 @Composable
-fun SiteCard(site: CleanUpSite, themeViewModel: ThemeViewModel) {
+fun SiteCard(
+    site: CleanUpSite,
+    themeViewModel: ThemeViewModel,
+    navController: NavController,
+    userId: String,
+    onJoinSite: (String) -> Unit
+) {
 
     val isDarkTheme = themeViewModel.isDarkTheme.value
     val imageRes = when {
@@ -36,14 +44,17 @@ fun SiteCard(site: CleanUpSite, themeViewModel: ThemeViewModel) {
         site.level == DirtyLevel.CLEANED && isDarkTheme -> R.drawable.cleaned_dark
         else -> R.drawable.cleaned_light
     }
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(MaterialTheme.colorScheme.surface),
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable {
+                navController.navigate("site_detail/${site.id}")
+            },
         shape = RoundedCornerShape(8.dp),
-    ) {
+
+        ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()

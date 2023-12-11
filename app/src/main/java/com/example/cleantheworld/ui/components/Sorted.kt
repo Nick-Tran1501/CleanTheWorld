@@ -38,12 +38,12 @@ fun SortDropdown(onSortChanged: (String) -> Unit) {
                 Icon(
                     imageVector = Icons.Filled.ArrowDropDown,
                     contentDescription = "Dropdown Arrow",
-                    modifier = Modifier.clickable { expanded = !expanded }
+                    modifier = Modifier.clickable { expanded = !expanded },
+                    tint = MaterialTheme.colors.secondary
                 )
             },
             textStyle = MaterialTheme.typography.caption,
-            modifier = Modifier
-                .clickable { expanded = true }
+            modifier = Modifier.clickable { expanded = true }
         )
 
         DropdownMenu(
@@ -58,7 +58,8 @@ fun SortDropdown(onSortChanged: (String) -> Unit) {
                 }) {
                     Text(
                         text = option,
-                        style = MaterialTheme.typography.caption
+                        style = MaterialTheme.typography.caption,
+                        color = MaterialTheme.colors.secondary
                     )
                 }
             }

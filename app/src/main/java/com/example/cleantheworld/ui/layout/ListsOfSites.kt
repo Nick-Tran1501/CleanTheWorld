@@ -1,5 +1,6 @@
 package com.example.cleantheworld.ui.layout
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.cleantheworld.models.CleanUpSite
 import com.example.cleantheworld.models.DirtyLevel
 import com.example.cleantheworld.myFirebaseManager.CleanUpSiteManager
@@ -24,7 +26,7 @@ import com.example.cleantheworld.ui.components.SortDropdown
 import com.example.cleantheworld.utils.ThemeViewModel
 
 @Composable
-fun ListOfSites(themeViewModel: ThemeViewModel) {
+fun ListOfSites(themeViewModel: ThemeViewModel, navController: NavController, userId: String) {
     var sites by remember {
         mutableStateOf<List<CleanUpSite>>(mutableListOf())
     }
@@ -53,7 +55,7 @@ fun ListOfSites(themeViewModel: ThemeViewModel) {
         print("Hello $sites")
 
     }
-    Column {
+    Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         Text(
             "All Sites",
             color = MaterialTheme.colorScheme.primary,
@@ -71,7 +73,9 @@ fun ListOfSites(themeViewModel: ThemeViewModel) {
 
         LazyColumn {
             items(filteredAndSortedSites) { site ->
-                SiteCard(site, themeViewModel)
+                SiteCard(site, themeViewModel, navController, userId, onJoinSite = { siteId ->
+                    CleanUpSiteManager.joinSite(siteId, userId)
+                })
             }
         }
     }

@@ -54,15 +54,30 @@ fun HomeScreenActivity(themeViewModel: ThemeViewModel) {
             composable("home_screen") {
                 HomeScreenActivity(themeViewModel)
             }
-            composable("list_of_sites") { ListOfSites(themeViewModel) }
+            composable("list_of_sites") {
+                currentUser?.let { it1 ->
+                    ListOfSites(
+                        themeViewModel,
+                        navController,
+                        it1.id
+                    )
+                }
+            }
             composable("nearby_list_of_sites") { NearbySites(themeViewModel) }
             composable("my_list_of_sites") {
                 currentUser?.let { it1 ->
                     MySites(
                         it1.id,
-                        themeViewModel
+                        themeViewModel,
+                        navController,
                     )
                 }
+            }
+            composable("site_detail/{siteId}") { backStackEntry ->
+                SiteDetailActivity(
+                    siteId = backStackEntry.arguments?.getString("siteId") ?: "",
+                    navController
+                )
             }
             composable("profile") {
                 currentUser?.let { it1 ->

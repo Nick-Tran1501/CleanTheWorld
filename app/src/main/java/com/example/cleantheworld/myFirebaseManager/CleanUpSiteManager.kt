@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.cleantheworld.models.CleanUpSite
 import com.example.cleantheworld.models.User
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
@@ -59,6 +60,32 @@ object CleanUpSiteManager {
         return sitesList.distinctBy { it.id }
     }
 
+    suspend fun getSiteDetailById(siteId: String): CleanUpSite? {
+        return try {
+            val documentSnapshot = db.collection("sites").document(siteId).get().await()
+            if (documentSnapshot.exists()) {
+                documentSnapshot.toObject(CleanUpSite::class.java)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            // Handle exceptions appropriately
+            null
+        }
+    }
+
+    fun joinSite(siteId: String, userId: String) {
+        val siteRef = db.collection("sites").document(siteId)
+
+        // Atomically add a new participant ID to the "participantIds" array field
+        siteRef.update("participantIds", FieldValue.arrayUnion(userId))
+            .addOnSuccessListener {
+                // Handle success (e.g., show a success message or update UI)
+            }
+            .addOnFailureListener { e ->
+                // Handle failure (e.g., show an error message)
+            }
+    }
 
     fun populateUserFromReferences(userId: String): User? {
         var user: User? = null
