@@ -1,9 +1,9 @@
 package com.example.cleantheworld.myFirebaseManager
 
 import android.content.ContentValues.TAG
+import android.location.Location
 import android.util.Log
 import com.example.cleantheworld.models.CleanUpSite
-import com.example.cleantheworld.models.User
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -54,6 +54,7 @@ object CleanUpSiteManager {
                 .toObjects(CleanUpSite::class.java)
             sitesList.addAll(adminSites)
         } catch (e: Exception) {
+            Log.d(TAG, e.toString())
             // Handle exceptions
         }
 
@@ -70,6 +71,7 @@ object CleanUpSiteManager {
             }
         } catch (e: Exception) {
             // Handle exceptions appropriately
+            Log.d(TAG, e.toString())
             null
         }
     }
@@ -80,21 +82,37 @@ object CleanUpSiteManager {
         // Atomically add a new participant ID to the "participantIds" array field
         siteRef.update("participantIds", FieldValue.arrayUnion(userId))
             .addOnSuccessListener {
+                fetchUpdatedSite(siteId)
                 // Handle success (e.g., show a success message or update UI)
             }
             .addOnFailureListener { e ->
-                // Handle failure (e.g., show an error message)
+                Log.d(TAG, e.toString())
             }
     }
 
-    fun populateUserFromReferences(userId: String): User? {
-        var user: User? = null
-        db.collection("users").document(userId).get().addOnSuccessListener { userDocument ->
-            user = userDocument.toObject<User>()
-        }.addOnFailureListener { exception ->
-            Log.d(TAG, "Error getting user: ", exception)
+    private fun fetchUpdatedSite(siteId: String) {
+        db.collection("sites").document(siteId).get()
+            .addOnSuccessListener { documentSnapshot ->
+                val updatedSite = documentSnapshot.toObject(CleanUpSite::class.java)
+
+            }
+            .addOnFailureListener { e ->
+
+            }
+    }
+
+    fun getNearbySites(
+        userLocation: Location,
+        sites: List<CleanUpSite>,
+        maxDistance: Float
+    ): List<CleanUpSite> {
+        return sites.filter { site ->
+            val siteLocation = Location("").apply {
+                latitude = site.latitude
+                longitude = site.longitude
+            }
+            userLocation.distanceTo(siteLocation) <= maxDistance
         }
-        return user
     }
 
 }

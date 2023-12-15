@@ -6,3 +6,10 @@ enum class DirtyLevel {
     LOW,
     CLEANED
 }
+fun parseDirtyLevel(value: String): DirtyLevel {
+    return try {
+        enumValueOf<DirtyLevel>(value)
+    } catch (e: IllegalArgumentException) {
+        DirtyLevel.CLEANED // Return a default value or handle the error as needed
+    }
+}

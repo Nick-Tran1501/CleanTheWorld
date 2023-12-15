@@ -28,4 +28,40 @@ class UserManager {
         }
         return user
     }
+
+    suspend fun updateUserName(userId: String, newName: String): Boolean {
+        return try {
+            val updateResult = db.collection("users").document(userId)
+                .update("name", newName)
+                .await()
+            true
+        } catch (e: Exception) {
+            Log.d(TAG, e.message.toString() ?: "Error updating user name")
+            false
+        }
+    }
+
+    suspend fun updateUserAge(userId: String, age: String): Boolean {
+        return try {
+            val updateResult = db.collection("users").document(userId)
+                .update("age", age)
+                .await()
+            true
+        } catch (e: Exception) {
+            Log.d(TAG, e.message.toString() ?: "Error updating user name")
+            false
+        }
+    }
+
+    suspend fun updateUserPhone(userId: String, phone: String): Boolean {
+        return try {
+            val updateResult = db.collection("users").document(userId)
+                .update("phone", phone)
+                .await()
+            true
+        } catch (e: Exception) {
+            Log.d(TAG, e.message.toString() ?: "Error updating user name")
+            false
+        }
+    }
 }

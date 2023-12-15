@@ -52,8 +52,6 @@ fun ListOfSites(themeViewModel: ThemeViewModel, navController: NavController, us
 
     LaunchedEffect(Unit) {
         sites = CleanUpSiteManager.getAllSites()
-        print("Hello $sites")
-
     }
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         Text(

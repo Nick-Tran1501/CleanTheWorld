@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.cleantheworld.authentication.UserAuthManager
 import com.example.cleantheworld.models.User
+import com.example.cleantheworld.myFirebaseManager.UserManager
 import com.example.cleantheworld.utils.ThemeViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun MyProfileScreen(user: User, themeViewModel: ThemeViewModel, navController: NavController) {
@@ -40,6 +43,9 @@ fun MyProfileScreen(user: User, themeViewModel: ThemeViewModel, navController: N
     var age by remember { mutableStateOf(user.age.toString()) }
     var phone by remember { mutableStateOf(user.phone) }
     val isDarkTheme = themeViewModel.isDarkTheme.value
+
+    val scope = rememberCoroutineScope()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -53,14 +59,20 @@ fun MyProfileScreen(user: User, themeViewModel: ThemeViewModel, navController: N
         Spacer(modifier = Modifier.height(16.dp))
 
         // Name field
-        ProfileField("Name", name, editingName, onEdit = { editingName = true }) {
+        ProfileField(
+            "Name",
+            name,
+            editingName,
+            onEdit = { editingName = true }
+        ) {
+            scope.launch { UserManager().updateUserName(user.id, name) }
             name = it
             editingName = false
-            // Update user's name in database or ViewModel
         }
 
         // Age field
         ProfileField("Age", age, editingAge, onEdit = { editingAge = true }) {
+            scope.launch { UserManager().updateUserAge(user.id, age) }
             age = it
             editingAge = false
             // Update user's age in database or ViewModel
@@ -68,6 +80,7 @@ fun MyProfileScreen(user: User, themeViewModel: ThemeViewModel, navController: N
 
         // Phone field
         ProfileField("Phone", phone, editingPhone, onEdit = { editingPhone = true }) {
+            scope.launch { UserManager().updateUserPhone(user.id, phone) }
             phone = it
             editingPhone = false
             // Update user's phone in database or ViewModel
@@ -77,7 +90,6 @@ fun MyProfileScreen(user: User, themeViewModel: ThemeViewModel, navController: N
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Dark mode toggle
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -119,17 +131,22 @@ fun ProfileField(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth()
     ) {
         if (editing) {
+
             TextField(
                 value = text,
                 onValueChange = { text = it },
                 label = { Text(label) }
             )
+
             Button(onClick = { onSubmit(text) }) {
                 Text("Submit")
             }
+
+
         } else {
             Text("$label: $value")
             IconButton(onClick = onEdit) {

@@ -55,8 +55,8 @@ fun SiteDetailActivity(siteId: String, navController: NavController) {
     val context = LocalContext.current
     val locationPermissionState =
         rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
-    var startingLocation by remember {
-        mutableStateOf(LatLng(10.762622, 106.660172))
+    val startingLocation by remember {
+        mutableStateOf(LatLng(10.775659, 106.7247))
     }
 
     LaunchedEffect(siteId) {
@@ -123,7 +123,10 @@ fun SiteDetailActivity(siteId: String, navController: NavController) {
 
             // Direction button
             Button(
-                onClick = { /* TODO: Navigate to MapView */ },
+                onClick = {
+                    locationPermissionState.launchPermissionRequest()
+                    navController.navigate("map_view/${site?.latitude}/${site?.longitude}/${site?.level}")
+                },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {

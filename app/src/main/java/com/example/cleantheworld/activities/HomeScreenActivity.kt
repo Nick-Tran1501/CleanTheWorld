@@ -63,7 +63,15 @@ fun HomeScreenActivity(themeViewModel: ThemeViewModel) {
                     )
                 }
             }
-            composable("nearby_list_of_sites") { NearbySites(themeViewModel) }
+            composable("nearby_list_of_sites") {
+                currentUser?.let { it1 ->
+                    NearbySites(
+                        themeViewModel,
+                        curUserId = it1.id,
+                        navController
+                    )
+                }
+            }
             composable("my_list_of_sites") {
                 currentUser?.let { it1 ->
                     MySites(
@@ -87,6 +95,22 @@ fun HomeScreenActivity(themeViewModel: ThemeViewModel) {
                         navController
                     )
                 }
+            }
+            composable("create_site") {
+                CreateSiteScreen()
+            }
+            composable("map_view/{latitude}/{longitude}/{dirtyLevel}") { backStackEntry ->
+                val latitude =
+                    backStackEntry.arguments?.getString("latitude")?.toDoubleOrNull() ?: 0.0
+                val longitude =
+                    backStackEntry.arguments?.getString("longitude")?.toDoubleOrNull() ?: 0.0
+                val dirtyLevel = backStackEntry.arguments?.getString("dirtyLevel") ?: ""
+                MapViewActivity(
+                    navController = navController,
+                    latitude = latitude,
+                    longitude = longitude,
+                    dirtyLevel = dirtyLevel
+                )
             }
         }
     }

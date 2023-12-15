@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -88,7 +89,7 @@ fun MySites(curUserId: String, themeViewModel: ThemeViewModel, navController: Na
                 sortOption = option
             })
 
-            Button(onClick = { /* TODO: Handle click */ }) {
+            Button(onClick = { navController.navigate("create_site") }) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = "Add New",
@@ -98,13 +99,29 @@ fun MySites(curUserId: String, themeViewModel: ThemeViewModel, navController: Na
                 Text("New")
             }
         }
+        if (filteredAndSortedSites.isNotEmpty()) {
+            LazyColumn {
+                items(filteredAndSortedSites) { site ->
+                    SiteCard(
+                        site,
+                        themeViewModel,
+                        navController,
+                        curUserId,
+                        onJoinSite = { siteId ->
+                            CleanUpSiteManager.joinSite(siteId, curUserId)
+                        })
+                }
+            }
+        } else {
+            Row(
+                modifier = Modifier
+                    .padding()
+                    .fillMaxSize(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
 
-
-        LazyColumn {
-            items(filteredAndSortedSites) { site ->
-                SiteCard(site, themeViewModel, navController, curUserId, onJoinSite = { siteId ->
-                    CleanUpSiteManager.joinSite(siteId, curUserId)
-                })
+                ) {
+                Text(text = "You are not joined to any site")
             }
         }
     }
