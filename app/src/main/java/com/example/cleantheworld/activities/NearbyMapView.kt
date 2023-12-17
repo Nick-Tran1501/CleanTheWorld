@@ -2,8 +2,8 @@ package com.example.cleantheworld.activities
 
 import android.Manifest
 import android.location.Location
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -13,9 +13,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
-import com.example.cleantheworld.models.parseDirtyLevel
+import com.example.cleantheworld.models.CleanUpSite
+import com.example.cleantheworld.myFirebaseManager.CleanUpSiteManager
 import com.example.cleantheworld.ui.components.CustomMapMaker
-import com.example.cleantheworld.utils.GoogleRouteAPI
+import com.example.cleantheworld.utils.TAG
 import com.example.cleantheworld.utils.getUserCurrentLocation
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -25,63 +26,54 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun MapViewActivity(
-    navController: NavController,
-    latitude: Double,
-    longitude: Double,
-    dirtyLevel: String
-) {
+fun NearbyMapView(navController: NavController) {
+    var sites by remember {
+        mutableStateOf<List<CleanUpSite>>(mutableListOf())
+    }
     val context = LocalContext.current
     val locationPermission =
         rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
 
-    var currentLocation by remember {
-        mutableStateOf<Location?>(null)
-    }
-
+    var currentUserLocation by remember { mutableStateOf<Location?>(null) }
     val startingLocation by remember {
-        mutableStateOf(LatLng(latitude, longitude))
+        mutableStateOf(LatLng(10.775659, 106.7247))
+    }
+    LaunchedEffect(Unit) {
+        sites = CleanUpSiteManager.getAllSites()
     }
 
     if (locationPermission.status.isGranted) {
         LaunchedEffect(Unit) {
-            currentLocation = getUserCurrentLocation(context)
-        }
-    }
-
-    var route by remember {
-        mutableStateOf<List<LatLng>>(emptyList())
-    }
-
-    if (currentLocation != null) {
-        LaunchedEffect(Unit) {
-            route = GoogleRouteAPI.getRoute(
-                LatLng(
-                    currentLocation!!.latitude,
-                    currentLocation!!.longitude
-                ), LatLng(latitude, longitude)
-            )
+            currentUserLocation = getUserCurrentLocation(context)
         }
     }
 
 
+    val nearbySites = currentUserLocation?.let { location ->
+        CleanUpSiteManager.getNearbySites(
+            location,
+            sites,
+            maxDistance = 20000f
+        )
+    } ?: listOf()
+    Log.d(TAG, "This is nearby sites${nearbySites.toString()}")
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(startingLocation, 15f)
-        if (currentLocation != null) {
-            position = CameraPosition.fromLatLngZoom(
+        position = if (currentUserLocation != null) {
+            CameraPosition.fromLatLngZoom(
                 LatLng(
-                    currentLocation!!.latitude,
-                    currentLocation!!.longitude
+                    currentUserLocation!!.latitude,
+                    currentUserLocation!!.longitude
                 ), 20f
             )
+        } else {
+            CameraPosition.fromLatLngZoom(startingLocation, 13f)
         }
     }
-    val dirtyLevelParse = parseDirtyLevel(dirtyLevel)
+
     GoogleMap(
         modifier = Modifier
             .fillMaxSize(),
@@ -89,18 +81,18 @@ fun MapViewActivity(
         properties = MapProperties(isMyLocationEnabled = locationPermission.status.isGranted),
         uiSettings = MapUiSettings(myLocationButtonEnabled = locationPermission.status.isGranted),
     ) {
-        CustomMapMaker(
-            context = context,
-            position = LatLng(latitude, longitude),
-            title = "Route",
-            description = "To the Site",
-            siteLevel = dirtyLevelParse,
-            onClick = { false }
-        )
-        if (route.isNotEmpty()) {
-            Polyline(points = route, color = MaterialTheme.colors.primary, width = 8f)
+        nearbySites.forEach { site ->
+            CustomMapMaker(
+                context = context,
+                position = LatLng(site.latitude, site.longitude),
+                title = "${site.name} location",
+                description = "To the Site",
+                siteLevel = site.level,
+                onClick = {
+                    navController.navigate("site_detail/${site.id}")
+                    true
+                }
+            )
         }
     }
-
-
 }

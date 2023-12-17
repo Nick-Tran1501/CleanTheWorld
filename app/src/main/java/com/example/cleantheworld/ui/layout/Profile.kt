@@ -65,25 +65,32 @@ fun MyProfileScreen(user: User, themeViewModel: ThemeViewModel, navController: N
             editingName,
             onEdit = { editingName = true }
         ) {
-            scope.launch { UserManager().updateUserName(user.id, name) }
+            scope.launch {
+                UserManager().updateUserName(user.id, name)
+                user.name = name
+            }
             name = it
             editingName = false
         }
 
         // Age field
         ProfileField("Age", age, editingAge, onEdit = { editingAge = true }) {
-            scope.launch { UserManager().updateUserAge(user.id, age) }
+            scope.launch {
+                UserManager().updateUserAge(user.id, age.toInt())
+                user.age = age.toInt()
+            }
             age = it
             editingAge = false
-            // Update user's age in database or ViewModel
         }
 
         // Phone field
         ProfileField("Phone", phone, editingPhone, onEdit = { editingPhone = true }) {
-            scope.launch { UserManager().updateUserPhone(user.id, phone) }
+            scope.launch {
+                UserManager().updateUserPhone(user.id, phone)
+                user.phone = phone
+            }
             phone = it
             editingPhone = false
-            // Update user's phone in database or ViewModel
         }
 
         Spacer(modifier = Modifier.height(16.dp))

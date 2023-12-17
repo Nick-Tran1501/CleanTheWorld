@@ -18,7 +18,8 @@ fun CustomMapMaker(
     position: LatLng,
     title: String,
     description: String,
-    siteLevel: DirtyLevel
+    siteLevel: DirtyLevel,
+    onClick: (() -> Boolean)? = null
 ) {
 
     val imageRes = when (siteLevel) {
@@ -28,13 +29,15 @@ fun CustomMapMaker(
         else -> R.drawable.trash_cleaned
     }
     val icon = bitmapDescriptorFromVector(context, imageRes)
-    Marker(
-        state = MarkerState(position = position),
-        title = title,
-        snippet = description,
-        icon = icon
-
-    )
+    if (onClick != null) {
+        Marker(
+            state = MarkerState(position = position),
+            title = title,
+            snippet = description,
+            icon = icon,
+            onClick = { onClick() }
+        )
+    }
 }
 
 

@@ -31,7 +31,7 @@ class UserManager {
 
     suspend fun updateUserName(userId: String, newName: String): Boolean {
         return try {
-            val updateResult = db.collection("users").document(userId)
+            db.collection("users").document(userId)
                 .update("name", newName)
                 .await()
             true
@@ -41,9 +41,9 @@ class UserManager {
         }
     }
 
-    suspend fun updateUserAge(userId: String, age: String): Boolean {
+    suspend fun updateUserAge(userId: String, age: Int): Boolean {
         return try {
-            val updateResult = db.collection("users").document(userId)
+            db.collection("users").document(userId)
                 .update("age", age)
                 .await()
             true
@@ -55,7 +55,7 @@ class UserManager {
 
     suspend fun updateUserPhone(userId: String, phone: String): Boolean {
         return try {
-            val updateResult = db.collection("users").document(userId)
+            db.collection("users").document(userId)
                 .update("phone", phone)
                 .await()
             true

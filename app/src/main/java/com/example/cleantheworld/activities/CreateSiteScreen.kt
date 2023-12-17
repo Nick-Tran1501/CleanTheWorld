@@ -1,19 +1,14 @@
 package com.example.cleantheworld.activities
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -21,30 +16,47 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.cleantheworld.R
 import com.example.cleantheworld.models.CleanUpSite
 import com.example.cleantheworld.models.DirtyLevel
+import com.example.cleantheworld.myFirebaseManager.CleanUpSiteManager
 import com.example.cleantheworld.ui.components.LocationPicker
 import com.example.cleantheworld.ui.components.SortDropdown
+import com.example.cleantheworld.utils.TAG
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.launch
 
 @Composable
-fun CreateSiteScreen() {
+fun CreateSiteScreen(navController: NavController, curUserId: String) {
+    val scope = rememberCoroutineScope()
     var siteLocation by remember { mutableStateOf<LatLng?>(null) }
-
-
     var name by remember { mutableStateOf("") }
+    var shortDescription by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var selectedLevel by remember { mutableStateOf(DirtyLevel.CLEANED) }
     var selectedLocation by remember { mutableStateOf<LatLng?>(null) }
     var participantIds by remember { mutableStateOf(listOf<String>()) }
-    var adminId by remember { mutableStateOf("") }
+    var adminId by remember { mutableStateOf(curUserId) }
     var sortOption by remember { mutableStateOf("None") }
 
     Column {
+        Row {
+            IconButton(onClick = { navController.navigate("my_list_of_sites") }) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.back),
+                    contentDescription = "Toggle Theme",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
         Row(
             modifier = Modifier
                 .padding()
@@ -55,7 +67,7 @@ fun CreateSiteScreen() {
             Text(
                 "Create Site Form",
                 style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.primary
             )
         }
         OutlinedTextField(
@@ -66,7 +78,14 @@ fun CreateSiteScreen() {
             onValueChange = { name = it },
             label = { Text("Name") }
         )
-
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            value = shortDescription,
+            onValueChange = { shortDescription = it },
+            label = { Text("Short Description") }
+        )
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -75,8 +94,7 @@ fun CreateSiteScreen() {
             onValueChange = { description = it },
             label = { Text("Description") }
         )
-        // Dropdown for selecting DirtyLevel
-//        DropdownMenuForDirtyLevel(selectedLevel) { selectedLevel = it }
+
         SortDropdown(onSortChanged = { option ->
             sortOption = option
         })
@@ -84,51 +102,36 @@ fun CreateSiteScreen() {
 
         LocationPicker(onLocationSelected = { latLng ->
             siteLocation = latLng
+            selectedLocation = siteLocation
+            Log.d(TAG, "onLocationSelected: $selectedLocation")
         })
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                val newSite = CleanUpSite(
-                    name = name,
-                    description = description,
-                    level = selectedLevel,
-                    latitude = selectedLocation?.latitude ?: 0.0,
-                    longitude = selectedLocation?.longitude ?: 0.0,
-                    participantIds = participantIds,
-                    adminId = adminId
-                )
-//                onSiteCreated(newSite)
-            },
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
-            Text("Create Site")
-        }
-    }
-}
-
-@Composable
-fun DropdownMenuForDirtyLevel(selectedLevel: DirtyLevel, onLevelSelected: (DirtyLevel) -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding()
-            .border(BorderStroke(2.dp, MaterialTheme.colorScheme.primary))
-    ) {
-        Text(selectedLevel.name, Modifier.clickable { expanded = true })
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            DirtyLevel.values().forEach { level ->
-                DropdownMenuItem(text = { level.name }, onClick = {
-                    onLevelSelected(level)
-                    expanded = false
-                })
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    val newSite = CleanUpSite(
+                        name = name,
+                        description = description,
+                        shortDescription = shortDescription,
+                        level = selectedLevel,
+                        latitude = selectedLocation?.latitude ?: 0.0,
+                        longitude = selectedLocation?.longitude ?: 0.0,
+                        participantIds = participantIds.plus(adminId),
+                        adminId = adminId
+                    )
+                    scope.launch { CleanUpSiteManager.createSite(newSite) }
+                    navController.navigate("my_list_of_sites")
+                },
+            ) {
+                Text("Create Site")
             }
+
         }
     }
 }

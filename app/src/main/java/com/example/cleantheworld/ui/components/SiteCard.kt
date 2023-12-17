@@ -7,11 +7,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -49,25 +49,22 @@ fun SiteCard(
         else -> R.drawable.cleaned_light
     }
     Card(
+        shape = RoundedCornerShape(8.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(MaterialTheme.colorScheme.surface)
             .clickable {
                 navController.navigate("site_detail/${site.id}")
             },
-        shape = RoundedCornerShape(8.dp),
-
-        ) {
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.primaryContainer)
                 .padding(16.dp)
         ) {
-            // Image - Replace with actual image resource or URL
             Image(
-                painter = painterResource(id = imageRes), // Replace with actual image resource
+                painter = painterResource(id = imageRes),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -77,15 +74,13 @@ fun SiteCard(
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Site Name
             Text(
                 text = site.name,
                 style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Site Description
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -94,15 +89,9 @@ fun SiteCard(
                 Text(
                     text = site.shortDescription,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                 )
-                if (userId !in site.participantIds) {
-                    Button(
-                        onClick = { onJoinSite(site.id) },
-                    ) {
-                        Text("Join")
-                    }
-                }
+
             }
 
         }

@@ -1,7 +1,7 @@
 package com.example.cleantheworld.models
 
 data class CleanUpSite(
-    val id: String = "",
+    var id: String = "",
     val name: String = "",
     val level: DirtyLevel = DirtyLevel.CLEANED,
     val shortDescription: String = "",

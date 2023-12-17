@@ -39,6 +39,7 @@ import com.example.cleantheworld.ui.components.CustomMapMaker
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -49,10 +50,12 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun SiteDetailActivity(siteId: String, navController: NavController) {
+fun SiteDetailActivity(curUserId: String, siteId: String, navController: NavController) {
     var site by remember { mutableStateOf<CleanUpSite?>(null) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     val locationPermissionState =
         rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
     val startingLocation by remember {
@@ -67,7 +70,7 @@ fun SiteDetailActivity(siteId: String, navController: NavController) {
     }
 
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(startingLocation, 10f)
+        position = CameraPosition.fromLatLngZoom(startingLocation, 12f)
     }
     Scaffold(
         topBar = {
@@ -98,6 +101,18 @@ fun SiteDetailActivity(siteId: String, navController: NavController) {
                         .height(200.dp)
                         .padding(16.dp),
                     cameraPositionState = cameraPositionState,
+                    onMapClick = {
+                        scope.launch {
+                            cameraPositionState.animate(
+                                CameraUpdateFactory.newLatLng(
+                                    LatLng(
+                                        it.latitude,
+                                        it.longitude
+                                    )
+                                )
+                            )
+                        }
+                    },
                     properties = MapProperties(isMyLocationEnabled = locationPermissionState.status.isGranted),
                     uiSettings = MapUiSettings(myLocationButtonEnabled = locationPermissionState.status.isGranted)
                 ) {
@@ -106,7 +121,8 @@ fun SiteDetailActivity(siteId: String, navController: NavController) {
                         position = LatLng(it.latitude, it.longitude),
                         title = "Clean up site: ${it.name}",
                         description = it.description,
-                        siteLevel = it.level
+                        siteLevel = it.level,
+                        onClick = { false }
                     )
                 }
             }
@@ -135,6 +151,23 @@ fun SiteDetailActivity(siteId: String, navController: NavController) {
                     contentDescription = "Directions"
                 )
                 Text("Directions", color = MaterialTheme.colorScheme.onPrimary)
+            }
+            if (site?.participantIds?.contains(curUserId) == false) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { CleanUpSiteManager.joinSite(siteId, curUserId) },
+                ) {
+                    Text("Join")
+                }
+            } else {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = false,
+                    onClick = {}
+
+                ) {
+                    Text("Joined")
+                }
             }
         }
     }

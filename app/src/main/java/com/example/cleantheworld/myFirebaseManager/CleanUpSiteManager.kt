@@ -14,11 +14,16 @@ import kotlinx.coroutines.tasks.await
 object CleanUpSiteManager {
     private val db: FirebaseFirestore get() = Firebase.firestore
 
-    fun createCleanUpSite(site: CleanUpSite) {
-        db.collection("sites").document(site.id)
-            .set(site)
-            .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully written!") }
-            .addOnFailureListener { e -> Log.w(TAG, "Error writing document", e) }
+    suspend fun createSite(site: CleanUpSite): Result<Unit> {
+        return try {
+            val documentId = db.collection("sites").document().id
+            site.id = documentId
+            db.collection("sites").document(site.id).set(site).await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     suspend fun getAllSites(): List<CleanUpSite> {
@@ -55,7 +60,6 @@ object CleanUpSiteManager {
             sitesList.addAll(adminSites)
         } catch (e: Exception) {
             Log.d(TAG, e.toString())
-            // Handle exceptions
         }
 
         return sitesList.distinctBy { it.id }

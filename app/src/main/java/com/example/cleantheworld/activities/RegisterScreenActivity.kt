@@ -70,7 +70,7 @@ fun RegisterScreenActivity(navController: NavController, themeViewModel: ThemeVi
             IconButton(onClick = { navController.navigate("login_screen")}) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.back),
-                    contentDescription = "Toggle Theme",
+                    contentDescription = "Back",
                     tint = MaterialTheme.colorScheme.primary
                 )
             }

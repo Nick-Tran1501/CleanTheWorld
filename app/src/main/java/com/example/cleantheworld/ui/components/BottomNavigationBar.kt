@@ -21,17 +21,24 @@ import com.example.cleantheworld.R
 fun BottomNavigationBar(navController: NavController, admin: Boolean) {
     val items = mutableListOf(
 
-        BottomNavItem("My Sites", R.drawable.my_sites), // Replace with your actual icon resource
+        BottomNavItem("My Sites", R.drawable.my_sites),
         BottomNavItem("Profile", R.drawable.profile)
     )
 
     if (admin) {
         items.add(
-            0,
+            0, BottomNavItem("Map Sites", R.drawable.map),
+        )
+        items.add(
+            1,
             BottomNavItem("All Sites", R.drawable.sites)
-        ) // Add "All Sites" at the beginning if isAdmin is true
+        )
+
     } else {
-        items.add(0, BottomNavItem("Nearby", R.drawable.sites))
+        items.add(
+            0, BottomNavItem("Nearby Map", R.drawable.map),
+        )
+        items.add(1, BottomNavItem("Nearby", R.drawable.sites))
     }
 
     BottomAppBar(
@@ -60,6 +67,8 @@ fun BottomNavigationBar(navController: NavController, admin: Boolean) {
                 onClick = {
                     navController.navigate(
                         when (item.title) {
+                            "Map Sites" -> "map"
+                            "Nearby Map" -> "nearby_map"
                             "All Sites" -> "list_of_sites"
                             "My Sites" -> "my_list_of_sites"
                             "Nearby" -> "nearby_list_of_sites"
@@ -73,5 +82,3 @@ fun BottomNavigationBar(navController: NavController, admin: Boolean) {
 }
 
 data class BottomNavItem(val title: String, val icon: Int)
-
-

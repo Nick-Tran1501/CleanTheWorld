@@ -54,6 +54,12 @@ fun HomeScreenActivity(themeViewModel: ThemeViewModel) {
             composable("home_screen") {
                 HomeScreenActivity(themeViewModel)
             }
+            composable("nearby_map") {
+                NearbyMapView(navController)
+            }
+            composable("map") {
+                AllMapView(navController)
+            }
             composable("list_of_sites") {
                 currentUser?.let { it1 ->
                     ListOfSites(
@@ -82,10 +88,13 @@ fun HomeScreenActivity(themeViewModel: ThemeViewModel) {
                 }
             }
             composable("site_detail/{siteId}") { backStackEntry ->
-                SiteDetailActivity(
-                    siteId = backStackEntry.arguments?.getString("siteId") ?: "",
-                    navController
-                )
+                currentUser?.let {
+                    SiteDetailActivity(
+                        it.id,
+                        siteId = backStackEntry.arguments?.getString("siteId") ?: "",
+                        navController
+                    )
+                }
             }
             composable("profile") {
                 currentUser?.let { it1 ->
@@ -97,7 +106,7 @@ fun HomeScreenActivity(themeViewModel: ThemeViewModel) {
                 }
             }
             composable("create_site") {
-                CreateSiteScreen()
+                currentUser?.let { it1 -> CreateSiteScreen(navController, it1.id) }
             }
             composable("map_view/{latitude}/{longitude}/{dirtyLevel}") { backStackEntry ->
                 val latitude =
@@ -119,7 +128,7 @@ fun HomeScreenActivity(themeViewModel: ThemeViewModel) {
 private fun determineStartDestination(currentUser: User?): String {
     return when {
         currentUser == null -> "login_screen"
-        currentUser.admin -> "list_of_sites"
-        else -> "nearby_list_of_sites"
+        currentUser.admin -> "map"
+        else -> "nearby_map"
     }
 }

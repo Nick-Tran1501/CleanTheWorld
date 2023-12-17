@@ -47,8 +47,6 @@ fun NearbySites(themeViewModel: ThemeViewModel, curUserId: String, navController
     var searchQuery by remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
         sites = CleanUpSiteManager.getAllSites()
-        print("Hello $sites")
-
     }
     LaunchedEffect(locationPermissionState.status) {
         if (locationPermissionState.status.isGranted) {
@@ -56,7 +54,7 @@ fun NearbySites(themeViewModel: ThemeViewModel, curUserId: String, navController
         }
     }
     val nearbySites = currentUserLocation?.let { location ->
-        getNearbySites(location, sites, maxDistance = 10000f) // 10 km radius, for example
+        getNearbySites(location, sites, maxDistance = 10000f)
     } ?: listOf()
     val filteredAndSortedSites = nearbySites
         .filter {
