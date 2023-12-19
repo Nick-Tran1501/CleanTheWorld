@@ -40,7 +40,6 @@ object UserAuthManager {
                         name = name,
                         age = age.toInt(),
                         phone = phone,
-                        joinedSiteIds = listOf(),
                         admin = false
                     )
                     UserManager().createUserProfile(newUser)

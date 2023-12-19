@@ -6,8 +6,5 @@ data class User(
     val email: String = "",
     var age: Int = 0,
     var phone: String = "",
-    var joinedSiteIds: List<String> = listOf(),// IDs of sites the user has joined
     var admin: Boolean = false,
 )
-
-
