@@ -94,6 +94,17 @@ object CleanUpSiteManager {
             }
     }
 
+    fun leaveSite(siteId: String, userId: String) {
+        val siteRef = db.collection("sites").document(siteId)
+        siteRef.update("participantIds", FieldValue.arrayRemove(userId))
+            .addOnSuccessListener {
+                fetchUpdatedSite(siteId)
+            }
+            .addOnFailureListener { e ->
+                Log.d(TAG, e.toString())
+            }
+    }
+
     private fun fetchUpdatedSite(siteId: String) {
         db.collection("sites").document(siteId).get()
             .addOnSuccessListener { documentSnapshot ->

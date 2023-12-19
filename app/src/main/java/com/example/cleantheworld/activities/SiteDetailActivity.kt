@@ -3,6 +3,7 @@ package com.example.cleantheworld.activities
 import android.Manifest
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,7 +35,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.cleantheworld.R
 import com.example.cleantheworld.models.CleanUpSite
+import com.example.cleantheworld.models.User
 import com.example.cleantheworld.myFirebaseManager.CleanUpSiteManager
+import com.example.cleantheworld.myFirebaseManager.UserManager
 import com.example.cleantheworld.ui.components.CustomMapMaker
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -52,6 +55,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SiteDetailActivity(curUserId: String, siteId: String, navController: NavController) {
     var site by remember { mutableStateOf<CleanUpSite?>(null) }
+    var users by remember { mutableStateOf<List<User>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -65,7 +69,12 @@ fun SiteDetailActivity(curUserId: String, siteId: String, navController: NavCont
     LaunchedEffect(siteId) {
         coroutineScope.launch {
             site = CleanUpSiteManager.getSiteDetailById(siteId)
-            site?.let { Log.d(TAG, it.name) }
+            site?.let {
+                Log.d(TAG, it.name)
+                users = UserManager().getUsersByIds(site!!.participantIds)
+                Log.d(TAG, "Site Participants: $users")
+            }
+
         }
     }
 
@@ -133,9 +142,22 @@ fun SiteDetailActivity(curUserId: String, siteId: String, navController: NavCont
             Spacer(modifier = Modifier.height(16.dp))
             // Site Details
             Text("Description: ${site?.description}", style = MaterialTheme.typography.bodyMedium)
-            // ... other details ...
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            if (site?.adminId == curUserId) {
+                Column(
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Participants:", style = MaterialTheme.typography.titleMedium)
+                    users.forEach { user ->
+                        Text(user.name, style = MaterialTheme.typography.bodyLarge)
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
             // Direction button
             Button(
@@ -160,14 +182,27 @@ fun SiteDetailActivity(curUserId: String, siteId: String, navController: NavCont
                     Text("Join")
                 }
             } else {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = false,
-                    onClick = {}
+                Column {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = false,
+                        onClick = {}
 
-                ) {
-                    Text("Joined")
+                    ) {
+                        Text("Joined")
+                    }
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            CleanUpSiteManager.leaveSite(siteId, curUserId)
+                            navController.navigate("my_list_of_sites")
+                        }
+
+                    ) {
+                        Text("Leave")
+                    }
                 }
+
             }
         }
     }

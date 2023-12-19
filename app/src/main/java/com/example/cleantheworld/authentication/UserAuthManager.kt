@@ -54,6 +54,11 @@ object UserAuthManager {
             }
     }
 
+
+    fun getCurUserId(): String? {
+        return auth.currentUser?.uid
+    }
+
     suspend fun getCurUser(): User? {
         val currentUser = auth.currentUser
         var currentUserData: User? = null

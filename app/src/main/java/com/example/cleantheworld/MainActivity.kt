@@ -15,6 +15,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.cleantheworld.activities.HomeScreenActivity
 import com.example.cleantheworld.activities.LoginScreenActivity
 import com.example.cleantheworld.activities.RegisterScreenActivity
+import com.example.cleantheworld.authentication.UserAuthManager
+import com.example.cleantheworld.myFirebaseManager.UserManager
 import com.example.cleantheworld.ui.theme.AppTheme
 import com.example.cleantheworld.utils.ThemeViewModel
 import com.google.firebase.FirebaseApp
@@ -44,17 +46,26 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainNavigationActivity(){
+fun MainNavigationActivity() {
     val navController = rememberNavController()
     val themeViewModel: ThemeViewModel = viewModel()
-    NavHost(navController = navController, startDestination = "login_screen"){
-        composable("login_screen"){
+    val curUserId = UserAuthManager.getCurUserId()
+    var startRoute: String
+    if (curUserId != null) {
+        UserManager().sendFCMToken()
+        startRoute = "home_screen"
+    } else {
+        startRoute = "login_screen"
+    }
+//    UserManager().sendFCMToken()
+    NavHost(navController = navController, startDestination = startRoute) {
+        composable("login_screen") {
             LoginScreenActivity(navController, themeViewModel)
         }
-        composable("register_screen"){
+        composable("register_screen") {
             RegisterScreenActivity(navController, themeViewModel)
         }
-        composable("home_screen"){
+        composable("home_screen") {
             HomeScreenActivity(themeViewModel)
         }
 
