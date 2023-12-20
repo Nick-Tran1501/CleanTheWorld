@@ -177,7 +177,10 @@ fun SiteDetailActivity(curUserId: String, siteId: String, navController: NavCont
             if (site?.participantIds?.contains(curUserId) == false) {
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { CleanUpSiteManager.joinSite(siteId, curUserId) },
+                    onClick = {
+                        CleanUpSiteManager.joinSite(siteId, curUserId)
+                        navController.navigate("my_list_of_sites")
+                    },
                 ) {
                     Text("Join")
                 }
